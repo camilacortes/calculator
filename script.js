@@ -5,35 +5,82 @@ var calcInput = '';
 var canDecimal = true;
 var canOperator = false;
 
+var currNum = null;
+var currOp = null;
+var components = [];
+
 // when buttons are clicked execute functions
 
 btnContainer.addEventListener("click", function(event) {
-  outputsToScreen(event);
+  if(event.target.matches('.number')){
+    handleNum(event.target.value);
+  }else if(event.target.matches('.operator')){
+    handleOp(event.target.value);
+  }else if(event.target.value === '.'){
+    handleDecimal();
+  }else if(event.target.matches('#clear')){
+    calcScreen.innerHTML = '';
+  }else if(event.target.matches('.pos-neg-operator')){
+    handlePosOrNeg();
+  }
+  // detect if it's calculate
   evaluatesInput(event);
-  clearDisplay(event);
-  negOrPosNum(event);
+  
   //console.log(event);
 });
 
-// outputs numbers and operators to the screen. 
+// checks if its a num or an operator && decimal
 
-function outputsToScreen(event){
-  var btnVal = event.target.value;
-  if(btnVal === '.'){
-    if(canDecimal){
-      calcScreen.innerHTML = calcScreen.innerHTML + btnVal;
-      canDecimal = false;
-    }
-  }else if(event.target.matches(".number")){
-    canOperator = true;
-    calcScreen.innerHTML = calcScreen.innerHTML + btnVal;
-  }else if(event.target.matches(".operator")){
-    if(canOperator){
-      calcScreen.innerHTML = calcScreen.innerHTML + btnVal;
-      canOperator = false;
+function handleNum(num){
+  if(currNum){
+    calcScreen.innerHTML += num; 
+    currNum += num;
+  } else {
+    calcScreen.innerHTML += num;
+    components.push(currOp);
+    currOp = null; 
+  }
+}
+
+function handleOp(op){
+  if(currOp){
+    var firstPart = calcScreen.innerHTML.slice(0, calcScreen.innerHTML.length - 1);
+    calcScreen.innerHTML = firstPart + op;
+    currOp = op; 
+  }else {
+    calcScreen.innerHTML += op;
+    components.push(currNum);
+    currOp = op;
+  }
+}
+
+function handleDecimal(){
+  if(canDecimal){
+    addToScreen(btnVal);
+    canDecimal = false;
+  }
+}
+// +/- turn a number positive or negative when clicked
+function handlePosOrNeg(event){ 
+    if(currNum){
+      if(currNum > 0){
+        currNum = 0 - currNum; 
+        calcScreen.innerHTML.slice(0, calcScreen.innerHTML.length - currNum.length) + '-' + currNum;
+      }else{
+        currNum = 0 - currNum;
+        calcScreen.innerHTML.slice(0, calcScreen.innerHTML.length - currNum.length); 
+      }
     }
   }
-};
+  
+// handling the screen 
+function setScreen(input){
+  calcScreen.innerHTML = input;
+}
+
+function addToScreen(input){
+  calcScreen.innerHTML = calcScreen.innerHTML + input;
+}
 
 // evaluates equations  
 function evaluatesInput(event){
@@ -59,49 +106,24 @@ function isOperator(screenText){
   return false;
 }
 
-
-// clear button 
-function clearDisplay(event){
-  if(event.target.matches('#clear')){
-    calcScreen.innerHTML = '';
-  }
-}
-
-// +/- turn a number positive or negative when clicked
-function negOrPosNum(event){
-  if(event.target.matches('.pos-neg-operator')){ 
-    calcScreen.innerHTML = calcScreen.innerHTML * -1;
-  }
-}
-
-// keyboard event
-// add other if's statements for ops or a sep function for equals button 
+// keyboard event 
 
 document.addEventListener("keyup", function(event){
-  console.log('KEYUP', event);
+  // console.log('KEYUP', event);
   if(event.keyCode >= 48 && event.keyCode <= 57){
     addKeytoScrn(event);
   }
   if(event.keyCode === 189){
     addKeytoScrn(event);
   }
-  if(event.key === "+"){
+  if(['+','-','*','/'].includes(event.key)){
     addKeytoScrn(event);
-  }
-  if(event.key === "*"){
-    addKeytoScrn(event);
-  }
-  if(event.key === "*"){
-    addKeytoScrn(event);
-  }
-  if(event.key === "/"){
-    addKeytoScrn(event);
-  }
-  if(event.key === "Enter"){
-   evaluatesInput(event);
+  } else if(event.key === "Enter"){
+    evaluatesInput(event);
   }
 });
 
 function addKeytoScrn(event){
-  calcScreen.innerHTML= calcScreen.innerHTML + event.key;
-} 
+  addToScreen(event.key);
+}
+
