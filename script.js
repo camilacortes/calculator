@@ -23,9 +23,9 @@ btnContainer.addEventListener("click", function(event) {
   }else if(event.target.matches('.pos-neg-operator')){
     handlePosOrNeg();
   }
+    
   // detect if it's calculate
   evaluatesInput(event);
-  
   //console.log(event);
 });
 
@@ -60,26 +60,20 @@ function handleDecimal(){
     canDecimal = false;
   }
 }
+
 // +/- turn a number positive or negative when clicked
-function handlePosOrNeg(event){ 
+function handlePosOrNeg(){ 
+  if(event.target.matches('.pos-neg-operator')){
     if(currNum){
       if(currNum > 0){
         currNum = 0 - currNum; 
-        calcScreen.innerHTML.slice(0, calcScreen.innerHTML.length - currNum.length) + '-' + currNum;
+        calcScreen.innerHTML.slice(0, calcScreen.innerHTML.length - currNum.length) + '(-' +  currNum + ')';
       }else{
         currNum = 0 - currNum;
-        calcScreen.innerHTML.slice(0, calcScreen.innerHTML.length - currNum.length); 
+        calcScreen.innerHTML.slice(0, calcScreen.innerHTML.length - currNum.length) + '(' +  currNum  +')'; 
       }
     }
   }
-  
-// handling the screen 
-function setScreen(input){
-  calcScreen.innerHTML = input;
-}
-
-function addToScreen(input){
-  calcScreen.innerHTML = calcScreen.innerHTML + input;
 }
 
 // evaluates equations  
@@ -105,9 +99,19 @@ function isOperator(screenText){
   }
   return false;
 }
+  
+// handling the screen 
+function setScreen(input){
+  calcScreen.innerHTML = input;
+}
+
+function addToScreen(input){
+  calcScreen.innerHTML = calcScreen.innerHTML + input;
+}
+
+
 
 // keyboard event 
-
 document.addEventListener("keyup", function(event){
   // console.log('KEYUP', event);
   if(event.keyCode >= 48 && event.keyCode <= 57){
